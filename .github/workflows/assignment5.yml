@@ -3,7 +3,9 @@ name: Assignment 5 - Automated Testing
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+      - assignment5-failure-demo
   workflow_dispatch:
 
 permissions:

@@ -79,3 +79,6 @@ test('CI failure simulation', () => {
     'Intentional failure for CI demonstration'
   );
 });
+test('CI deployment gate failure demonstration', () => {
+  assert.strictEqual(1 + 1, 3);
+});
