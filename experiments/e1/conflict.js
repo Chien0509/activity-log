@@ -1,1 +1,3 @@
-export const releaseMessage = 'Feature A is ready for release';
+
+export const releaseMessage = 'Feature A and Feature B are ready for release';
+
