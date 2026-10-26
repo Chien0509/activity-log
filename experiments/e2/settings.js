@@ -4,5 +4,5 @@ export function appTitle() {
 
 // Separate collaborator region
 export function displayTheme() {
-  return 'light';
+  return 'dark';
 }
