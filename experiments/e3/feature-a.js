@@ -1,3 +1,3 @@
 export function featureA() {
-  return 'not implemented';
+  return 'feature A completed';
 }
