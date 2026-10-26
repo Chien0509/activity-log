@@ -1,0 +1,50 @@
+name: Assignment 6 - Advanced Git Audit
+
+on:
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  git-history-audit:
+    name: A6 Git History Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Compare original and rebased E3 A patch with git range-diff
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin master feature/e3-a
+          # The initial A patch was authored on the E1/E2 baseline.
+          # The same patch was replayed via GitHub Rebase & Merge (PR #9).
+          git range-diff b45866eb44dd4e655f0122a52203b8ff62577962..fda6bde5b15e80cf0e37c971f910df404c14244c 08de2bb7d4fd2ff272584f987933a0c92e373bd2..8b78796b48c958c1e440950240d4a80ca9a50c89
+
+      - name: Prove isolated fast-forward ancestry
+        shell: bash
+        run: |
+          set -euo pipefail
+          git switch --detach 08de2bb7d4fd2ff272584f987933a0c92e373bd2
+          git merge --ff-only 8b78796b48c958c1e440950240d4a80ca9a50c89
+          test "$(git rev-parse HEAD)" = "8b78796b48c958c1e440950240d4a80ca9a50c89"
+
+      - name: Capture actual git log graph as Actions artifact
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p evidence
+          git switch --detach 1a2cfe189545c358ea65b78b54d91eae5ecb6f46
+          git log --graph --oneline --decorate -20 | tee evidence/git-log-graph.txt
+          git show --no-patch --format="commit: %h%nparents: %p%nsubject: %s" 6bc088b30a02b2d072fd96089954b49a075ceacd | tee evidence/e1-parent-proof.txt
+          git range-diff b45866eb44dd4e655f0122a52203b8ff62577962..fda6bde5b15e80cf0e37c971f910df404c14244c 08de2bb7d4fd2ff272584f987933a0c92e373bd2..8b78796b48c958c1e440950240d4a80ca9a50c89 | tee evidence/range-diff.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: assignment6-git-audit-evidence
+          path: evidence/
